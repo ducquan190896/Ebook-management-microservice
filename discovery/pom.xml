@@ -18,14 +18,7 @@
 		<spring-cloud.version>2022.0.4</spring-cloud.version>
 	</properties>
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-config</artifactId>
-		</dependency>
+	
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
@@ -62,5 +55,14 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	<repositories>
+		<repository>
+			<id>netflix-candidates</id>
+			<name>Netflix Candidates</name>
+			<url>https://artifactory-oss.prod.netflix.net/artifactory/maven-oss-candidates</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 </project>
