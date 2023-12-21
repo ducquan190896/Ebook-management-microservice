@@ -15,25 +15,29 @@ public class BookRepos {
     
 
     public List<Book> getbooks() {
-        return books;
+        return this.books;
     }
 
     public Optional<Book> getBookById(String id) {
-       Optional<Book> bookOptional = books.stream().filter(b -> b.getId().equals(id)).findFirst();
+       Optional<Book> bookOptional = this.books.stream().filter(b -> b.getId().equals(id)).findFirst();
        return bookOptional;
     }
 
     public Book saveBook(Book book) {
         Optional<Book> bookOptional = getBookById(book.getId());
         if(!bookOptional.isPresent()) {
-            books.add(book);
+            this.books.add(book);
         } else {
-            books = books.stream().map(b -> b.getId().equals(book.getId()) ? book : b).collect(Collectors.toList());
+            this.books = this.books.stream().map(b -> b.getId().equals(book.getId()) ? book : b).collect(Collectors.toList());
         }
         return book;
     }
 
     public void deleteBook(Book book) {
-        books.remove(book);   
+        this.books.remove(book);   
+    }
+
+    public void deleteAll() {
+        this.books = new ArrayList<>();   
     }
 }
