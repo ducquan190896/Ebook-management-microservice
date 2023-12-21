@@ -12,7 +12,7 @@
 	<artifactId>ebook</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ebook</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Ebook management service</description>
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2022.0.4</spring-cloud.version>

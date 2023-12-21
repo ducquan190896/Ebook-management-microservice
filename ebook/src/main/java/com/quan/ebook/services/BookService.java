@@ -1,10 +1,12 @@
 package com.quan.ebook.services;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.quan.ebook.exceptions.EntityNotFoundException;
 import com.quan.ebook.mappers.BookMapper;
 import com.quan.ebook.models.dto.BookDto;
@@ -19,50 +21,63 @@ public class BookService {
     BookRepos bookRepos;
     @Autowired
     BookMapper bookMapper;
-    
+
     public Mono<List<Book>> getAllBooks() {
-        List<Book> bookList = bookRepos.getbooks();
-        Mono<List<Book>> books = Mono.just(bookList);
-        return books;
+        return Mono.fromCallable(() -> bookRepos.getbooks());
     }
 
     public Mono<BookDto> getBookById(String id) {
-        Book book = bookRepos.getBookById(id).orElseThrow(() -> new EntityNotFoundException("the book not found"));
-        BookDto bookDto = bookMapper.mapBookToBookDto(book);
-        return Mono.just(bookDto);
+        return Mono.fromCallable(() -> bookRepos.getBookById(id))
+                .flatMap(bookOrNot -> bookOrNot
+                        .map(book -> Mono.just(bookMapper.mapBookToBookDto(book)))
+                        .orElseGet(Mono::empty))
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("Book not found with id: " + id)));
     }
 
     public Mono<BookDto> saveBook(BookDto req) {
         Book book = Book.builder()
-                            .id(UUID.randomUUID().toString())
-                            .author(req.getAuthor())
-                            .title(req.getTitle())
-                            .format(req.getFormat())
-                            .build();
-        bookRepos.saveBook(book);
-        BookDto bookDto = bookMapper.mapBookToBookDto(book);
-        return Mono.just(bookDto);
+                .id(UUID.randomUUID().toString())
+                .author(req.getAuthor())
+                .title(req.getTitle())
+                .format(req.getFormat())
+                .build();
+
+        return Mono.fromCallable(() -> bookRepos.saveBook(book))
+                .map(bookMapper::mapBookToBookDto);
     }
 
     public Mono<BookDto> updateBook(String id, String author, String title, FormatType format) {
-        Book book = bookRepos.getBookById(id).orElseThrow(() -> new EntityNotFoundException("the book not found"));
-        if(!author.isEmpty()) {
+        return Mono.fromCallable(() -> bookRepos.getBookById(id))
+                .flatMap(bookOrNot -> bookOrNot
+                        .map(book -> {
+                            Book newBook = updateNewBook(book, author, title, format);
+                            return Mono.just(bookMapper.mapBookToBookDto(newBook));
+                        })
+                        .orElseGet(() -> Mono.empty()))
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("Book not found with id: " + id)));
+    }
+
+    public Mono<Void> deleteById(String id) {
+        return Mono.fromCallable(() -> bookRepos.getBookById(id))
+                .filter(Optional::isPresent)
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("Book not found with id: " + id)))
+                .map(Optional::get)
+                .flatMap(book -> {
+                    bookRepos.deleteBook(book);
+                    return Mono.empty();
+                });
+    }
+
+    private Book updateNewBook(Book book, String author, String title, FormatType format) {
+        if (!author.isEmpty()) {
             book.setAuthor(author);
         }
-        if(!title.isEmpty()) {
+        if (!title.isEmpty()) {
             book.setTitle(title);
         }
-        if(format != null) {
+        if (format != null) {
             book.setFormat(format);
         }
-        bookRepos.saveBook(book);
-        BookDto bookDto = bookMapper.mapBookToBookDto(book);
-        return Mono.just(bookDto);
-    }
-
-    public void deleteById(String id) {
-        Book book = bookRepos.getBookById(id).orElseThrow(() -> new EntityNotFoundException("the book not found"));
-        bookRepos.deleteBook(book);
+        return bookRepos.saveBook(book);
     }
 }
-
