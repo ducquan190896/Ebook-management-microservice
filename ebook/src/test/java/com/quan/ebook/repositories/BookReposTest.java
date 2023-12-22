@@ -25,17 +25,18 @@ public class BookReposTest {
     private final String newAuthor = "new author";
     private final String newTitle = "new title";
     private final FormatType newFormat = FormatType.pdf;
+    private final String NotFoundBookId = "lkajdk11111";
 
     @BeforeAll
     public void setUp() {
         Book book1 = Book.builder()
-                .id(UUID.randomUUID().toString())
+                .id(GenerateUUID())
                 .author("abc")
                 .title("abc_title")
                 .format(FormatType.epub)
                 .build();
         Book book2 = Book.builder()
-                .id(UUID.randomUUID().toString())
+                .id(GenerateUUID())
                 .author("abc2")
                 .title("abc2_title")
                 .format(FormatType.epub)
@@ -55,7 +56,7 @@ public class BookReposTest {
 
     @Test
     public void BookRepos_GetBookById_ReturnBook() {
-        Book book = getFirstBookFromRepository();
+        Book book = getFirstBookFromMockRepository();
 
         Book savedBook = bookRepos.getBookById(book.getId()).get();
 
@@ -64,9 +65,16 @@ public class BookReposTest {
         Assertions.assertThat(savedBook.getAuthor()).isEqualTo(book.getAuthor());
     }
 
+     @Test
+    public void BookRepos_GetBookById_ReturnBookNotFound() {
+        Optional<Book> savedBook = bookRepos.getBookById(NotFoundBookId);
+
+        Assertions.assertThat(savedBook.isPresent()).isEqualTo(false);
+    }
+
     @Test
     public void BookRepos_SaveBook_ReturnUpdatedBook() {
-        Book book = getFirstBookFromRepository();
+        Book book = getFirstBookFromMockRepository();
 
         // update book
         book.setAuthor(newAuthor);
@@ -90,17 +98,21 @@ public class BookReposTest {
         Assertions.assertThat(bookOptional.isPresent()).isEqualTo(false);
     }
 
-    private Book getFirstBookFromRepository() {
+    private Book getFirstBookFromMockRepository() {
         return bookRepos.getbooks().get(0);
     }
 
     private Book createSampleBook() {
         Book book = Book.builder()
-                .id(UUID.randomUUID().toString())
+                .id(GenerateUUID())
                 .author("abc3")
                 .title("abc3_title")
                 .format(FormatType.epub)
                 .build();
         return bookRepos.saveBook(book);
+    }
+
+    private String GenerateUUID() {
+        return UUID.randomUUID().toString();
     }
 }

@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.quan.ebook.models.enums.FormatType;
 
@@ -13,6 +15,7 @@ import com.quan.ebook.models.enums.FormatType;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class BookDto {
     @JsonProperty("author")
     private String author;
@@ -20,4 +23,5 @@ public class BookDto {
     private String title;
     @JsonProperty("format")
     private FormatType format;
+    
 }

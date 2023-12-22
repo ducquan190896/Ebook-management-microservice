@@ -42,8 +42,8 @@ public class BookService {
                 .format(req.getFormat())
                 .build();
 
-        return Mono.fromCallable(() -> bookRepos.saveBook(book))
-                .map(bookMapper::mapBookToBookDto);
+        return  Mono.fromCallable(() -> bookRepos.saveBook(book))
+                    .map(bookMapper::mapBookToBookDto);
     }
 
     public Mono<BookDto> updateBook(String id, String author, String title, FormatType format) {
@@ -68,7 +68,7 @@ public class BookService {
                 });
     }
 
-    private Book updateNewBook(Book book, String author, String title, FormatType format) {
+    public Book updateNewBook(Book book, String author, String title, FormatType format) {
         if (!author.isEmpty()) {
             book.setAuthor(author);
         }
