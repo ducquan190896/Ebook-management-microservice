@@ -65,7 +65,7 @@ public class BookReposTest {
         Assertions.assertThat(savedBook.getAuthor()).isEqualTo(book.getAuthor());
     }
 
-     @Test
+    @Test
     public void BookRepos_GetBookById_ReturnBookNotFound() {
         Optional<Book> savedBook = bookRepos.getBookById(NotFoundBookId);
 

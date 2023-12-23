@@ -1,0 +1,28 @@
+{
+  "data": [
+    {
+      "id": "6e8d83c0-f47a-4cc4-a33e-b86440a8ec0d",
+      "author": "abc...0",
+      "title": "abc...0",
+      "format": "epub"
+    },
+    {
+      "id": "54012831-5991-4dcc-a3a0-540c2aa2f1f5",
+      "author": "abc...1",
+      "title": "abc...1",
+      "format": "epub"
+    },
+    {
+      "id": "123",
+      "author": "abc...2",
+      "title": "abc...2",
+      "format": "epub"
+    },
+    {
+      "id": "73d99ba3-591e-4fd6-a1a5-ecce98b5a36e",
+      "author": "abc...3",
+      "title": "abc...3",
+      "format": "epub"
+    }
+  ]
+}

@@ -42,8 +42,8 @@ public class BookService {
                 .format(req.getFormat())
                 .build();
 
-        return  Mono.fromCallable(() -> bookRepos.saveBook(book))
-                    .map(bookMapper::mapBookToBookDto);
+        return Mono.fromCallable(() -> bookRepos.saveBook(book))
+                .map(bookMapper::mapBookToBookDto);
     }
 
     public Mono<BookDto> updateBook(String id, String author, String title, FormatType format) {
