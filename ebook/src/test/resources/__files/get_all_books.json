@@ -1,28 +1,20 @@
-{
-  "data": [
+[
     {
-      "id": "6e8d83c0-f47a-4cc4-a33e-b86440a8ec0d",
-      "author": "abc...0",
-      "title": "abc...0",
-      "format": "epub"
+        "id": "793678c2-adaf-450a-b236-cce93eb555d0",
+        "author": "abc...0",
+        "title": "abc...0",
+        "format": "epub"
     },
     {
-      "id": "54012831-5991-4dcc-a3a0-540c2aa2f1f5",
-      "author": "abc...1",
-      "title": "abc...1",
-      "format": "epub"
+        "id": "4bf7b9a1-f9e7-4615-aa2a-bbe8c2253d1c",
+        "author": "abc...1",
+        "title": "abc...1",
+        "format": "epub"
     },
     {
-      "id": "123",
-      "author": "abc...2",
-      "title": "abc...2",
-      "format": "epub"
-    },
-    {
-      "id": "73d99ba3-591e-4fd6-a1a5-ecce98b5a36e",
-      "author": "abc...3",
-      "title": "abc...3",
-      "format": "epub"
+        "id": "b7c52db2-55bc-4bcc-ac97-7394e51de525",
+        "author": "abc...2",
+        "title": "abc...2",
+        "format": "epub"
     }
-  ]
-}
+]
