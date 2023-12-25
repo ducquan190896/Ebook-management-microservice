@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import com.quan.ebook.models.dto.BookDto;
+import com.quan.ebook.models.dto.BookListDto;
 import com.quan.ebook.models.entities.Book;
 import com.quan.ebook.models.enums.FormatType;
 import com.quan.ebook.services.BookService;
@@ -33,7 +35,7 @@ public class BookController implements EbookManagementEndpoint {
     BookService bookService;
 
     @Override
-    public Mono<List<Book>> findAll() {
+    public Mono<BookListDto> findAll() {
         return bookService.getAllBooks();
     }
 

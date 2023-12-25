@@ -3,14 +3,19 @@ package com.quan.ebook.testUtils;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.quan.ebook.models.dto.BookDto;
 import com.quan.ebook.models.entities.Book;
 import com.quan.ebook.models.enums.FormatType;
 
 @Component
 public class DataGenerator {
+    @Autowired
+    private ObjectMapper objectMapper;
+
      public Book generateBook() {
         return Book.builder()
                             .id(generateUUID())
@@ -46,5 +51,9 @@ public class DataGenerator {
 
     public String generateUUID() {
         return UUID.randomUUID().toString();
+    }
+
+    public String convertBookDtoToString(BookDto bookDto) throws Exception {
+        return objectMapper.writeValueAsString(bookDto);
     }
 }

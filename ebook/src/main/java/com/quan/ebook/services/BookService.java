@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.quan.ebook.exceptions.EntityNotFoundException;
 import com.quan.ebook.mappers.BookMapper;
 import com.quan.ebook.models.dto.BookDto;
+import com.quan.ebook.models.dto.BookListDto;
 import com.quan.ebook.models.entities.Book;
 import com.quan.ebook.models.enums.FormatType;
 import com.quan.ebook.repositories.BookRepos;
@@ -22,8 +23,9 @@ public class BookService {
     @Autowired
     BookMapper bookMapper;
 
-    public Mono<List<Book>> getAllBooks() {
-        return Mono.fromCallable(() -> bookRepos.getbooks());
+    public Mono<BookListDto> getAllBooks() {
+        return Mono.fromCallable(() -> bookRepos.getbooks())
+                .map(books -> BookListDto.builder().data(books).build());
     }
 
     public Mono<BookDto> getBookById(String id) {
@@ -69,10 +71,10 @@ public class BookService {
     }
 
     public Book updateNewBook(Book book, String author, String title, FormatType format) {
-        if (!author.isEmpty()) {
+        if (author != null) {
             book.setAuthor(author);
         }
-        if (!title.isEmpty()) {
+        if (title != null) {
             book.setTitle(title);
         }
         if (format != null) {
@@ -80,4 +82,5 @@ public class BookService {
         }
         return bookRepos.saveBook(book);
     }
+
 }
