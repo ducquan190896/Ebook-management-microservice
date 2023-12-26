@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -42,37 +43,32 @@ public interface EbookManagementEndpoint {
 
         @Operation(summary = "Get all books", description = "the endpoint to provide all books")
         @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-        @ResponseStatus(HttpStatus.OK)
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "The list of books", content = @Content(schema = @Schema(implementation = BookListDto.class))),
                         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
         })
-        public Mono<BookListDto> findAll();
+        public Mono<ResponseEntity<BookListDto>> findAll();
 
         @Operation(summary = "Get book by book Id", description = "the endpoint to provide the book by book Id")
         @GetMapping(value = "/{ebook_id}")
-        @ResponseStatus(HttpStatus.OK)
         @Parameters(@Parameter(name = "ebook_id", required = true, in = ParameterIn.PATH, description = "Id of the book", schema = @Schema(implementation = String.class)))
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "The book", content = @Content(schema = @Schema(implementation = BookDto.class))),
                         @ApiResponse(responseCode = "404", description = "Book not found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
         })
-        public Mono<BookDto> findById(@PathVariable(value = "ebook_id") String ebook_id);
+        public Mono<ResponseEntity<BookDto>> findById(@PathVariable(value = "ebook_id") String ebook_id);
 
         @Operation(summary = "Create a book", description = "the endpoint to create the book")
-        @PostMapping(value = "")
-        @ResponseStatus(HttpStatus.CREATED)
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Book data", required = true, content = @Content(schema = @Schema(implementation = BookDto.class)))
+        @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
         @ApiResponses({
-                        @ApiResponse(responseCode = "201", description = "The book is created", content = @Content(schema = @Schema(implementation = BookDto.class))),
+                        @ApiResponse(responseCode = "200", description = "The book is created", content = @Content(schema = @Schema(implementation = BookDto.class))),
                         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
         })
-        public Mono<BookDto> save(@RequestBody @Valid BookDto book);
+        public Mono<ResponseEntity<BookDto>> save(@RequestBody  BookDto book);
 
         @Operation(summary = "Update a book", description = "the endpoint to update the book")
         @PatchMapping(value = "/{ebook_id}")
-        @ResponseStatus(HttpStatus.OK)
         @Parameters({
                         @Parameter(name = "ebook_id", required = true, in = ParameterIn.PATH, description = "Id of the book", schema = @Schema(implementation = String.class)),
                         @Parameter(name = "author", required = false, in = ParameterIn.QUERY, description = "Author of the book", schema = @Schema(implementation = String.class)),
@@ -85,19 +81,18 @@ public interface EbookManagementEndpoint {
                         @ApiResponse(responseCode = "404", description = "Book not found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
         })
-        public Mono<BookDto> update(@PathVariable(value = "ebook_id") String ebook_id,
+        public Mono<ResponseEntity<BookDto>> update(@PathVariable(value = "ebook_id") String ebook_id,
                         @RequestParam(required = false, value = "author") String author,
                         @RequestParam(required = false, value = "title") String title,
                         @RequestParam(required = false, value = "format") FormatType format);
 
         @Operation(summary = "Delete book by book Id", description = "the endpoint to delete the book by book Id")
         @DeleteMapping(value = "/{ebook_id}")
-        @ResponseStatus(HttpStatus.NO_CONTENT)
         @Parameters(@Parameter(name = "ebook_id", required = true, in = ParameterIn.PATH, description = "Id of the book", schema = @Schema(implementation = String.class)))
         @ApiResponses({
                         @ApiResponse(responseCode = "204", description = "The book", content = @Content(schema = @Schema(implementation = Void.class))),
                         @ApiResponse(responseCode = "404", description = "Book not found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
         })
-        public Mono<Void> deleteById(@PathVariable(value = "ebook_id") String ebook_id);
+        public Mono<ResponseEntity<HttpStatus>> deleteById(@PathVariable(value = "ebook_id") String ebook_id);
 }

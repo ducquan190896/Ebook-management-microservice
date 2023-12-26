@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.quan.ebook.exceptions.BadResultException;
 import com.quan.ebook.exceptions.EntityNotFoundException;
 import com.quan.ebook.mappers.BookMapper;
 import com.quan.ebook.models.dto.BookDto;
@@ -38,25 +39,32 @@ public class BookService {
 
     public Mono<BookDto> saveBook(BookDto req) {
         Book book = Book.builder()
-                .id(UUID.randomUUID().toString())
                 .author(req.getAuthor())
                 .title(req.getTitle())
                 .format(req.getFormat())
                 .build();
-
-        return Mono.fromCallable(() -> bookRepos.saveBook(book))
-                .map(bookMapper::mapBookToBookDto);
+                
+        return Mono.fromCallable(() -> bookRepos.checkDuplicatedTitle(req.getTitle()))
+                .filter(isDuplicatedOrNot -> isDuplicatedOrNot == false)
+                .map(__ -> {
+                    Book bookSaved = bookRepos.saveBook(book);
+                    return bookMapper.mapBookToBookDto(bookSaved);
+                })
+                .switchIfEmpty(Mono.error(new BadResultException("the book title is duplicated")));
     }
 
     public Mono<BookDto> updateBook(String id, String author, String title, FormatType format) {
         return Mono.fromCallable(() -> bookRepos.getBookById(id))
+                .filter(Optional::isPresent)
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("Book not found with id: " + id)))
                 .flatMap(bookOrNot -> bookOrNot
+                        .filter(__ -> bookRepos.checkDuplicatedTitle(title) == false)
                         .map(book -> {
                             Book newBook = updateNewBook(book, author, title, format);
                             return Mono.just(bookMapper.mapBookToBookDto(newBook));
                         })
                         .orElseGet(() -> Mono.empty()))
-                .switchIfEmpty(Mono.error(new EntityNotFoundException("Book not found with id: " + id)));
+                .switchIfEmpty(Mono.error(new BadResultException("the book title is duplicated")));
     }
 
     public Mono<Void> deleteById(String id) {
@@ -71,16 +79,15 @@ public class BookService {
     }
 
     public Book updateNewBook(Book book, String author, String title, FormatType format) {
-        if (author != null) {
-            book.setAuthor(author);
-        }
         if (title != null) {
             book.setTitle(title);
+        }
+        if (author != null) {
+            book.setAuthor(author);
         }
         if (format != null) {
             book.setFormat(format);
         }
         return bookRepos.saveBook(book);
     }
-
 }

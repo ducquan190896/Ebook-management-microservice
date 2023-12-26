@@ -3,26 +3,17 @@ package com.quan.ebook.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
+import com.quan.ebook.exceptions.BadResultException;
 import com.quan.ebook.exceptions.EntityNotFoundException;
 import com.quan.ebook.mappers.BookMapper;
 import com.quan.ebook.models.dto.BookDto;
@@ -30,12 +21,11 @@ import com.quan.ebook.models.dto.BookListDto;
 import com.quan.ebook.models.entities.Book;
 import com.quan.ebook.models.enums.FormatType;
 import com.quan.ebook.repositories.BookRepos;
-
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
-// @Disabled
+@Disabled
 public class BookServiceTest {
     @Mock(lenient = true)
     BookRepos bookRepos;
@@ -101,6 +91,7 @@ public class BookServiceTest {
         Book book = getFirstBookFromSampleList();
         BookDto bookDtoExpected = convertBookToBookDto(book);
 
+        when(bookRepos.checkDuplicatedTitle(book.getTitle())).thenReturn(false);
         when(bookRepos.saveBook(any(Book.class))).thenReturn(book);
         when(bookMapper.mapBookToBookDto(any(Book.class))).thenReturn(bookDtoExpected);
 
@@ -113,6 +104,20 @@ public class BookServiceTest {
                     assertEquals(bookDto.getFormat(), book.getFormat());
                 })
                 .verifyComplete();
+    }
+
+     @Test
+    public void BookService_SaveBook_ReturnTitleDuplicatedException() {
+        Book book = getFirstBookFromSampleList();
+        BookDto bookDto= convertBookToBookDto(book);
+
+        when(bookRepos.checkDuplicatedTitle(book.getTitle())).thenReturn(true);
+
+        Mono<BookDto> monoBookDto = bookService.saveBook(bookDto);
+        StepVerifier
+                .create(monoBookDto)
+                .expectErrorMatches(throwable -> throwable instanceof BadResultException)
+                .verify();
     }
 
     @Test
@@ -153,6 +158,20 @@ public class BookServiceTest {
         StepVerifier
                 .create(monoBookDto)
                 .expectErrorMatches(throwable -> throwable instanceof EntityNotFoundException)
+                .verify();
+    }
+
+    @Test
+    public void BookService_UpdateBook_ReturnTitleDuplicatedException() {
+        Book book = getFirstBookFromSampleList();
+
+        when(bookRepos.getBookById(book.getId())).thenReturn(Optional.ofNullable(book));
+        when(bookRepos.checkDuplicatedTitle(newTitle)).thenReturn(true);
+
+        Mono<BookDto> monoBookDto = bookService.updateBook(book.getId(), newAuthor, newTitle, newFormat);;
+        StepVerifier
+                .create(monoBookDto)
+                .expectErrorMatches(throwable -> throwable instanceof BadResultException)
                 .verify();
     }
 

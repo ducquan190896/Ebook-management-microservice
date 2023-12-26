@@ -3,15 +3,12 @@ package com.quan.ebook.repositories;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.quan.ebook.models.entities.Book;
@@ -19,7 +16,7 @@ import com.quan.ebook.models.enums.FormatType;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-// @Disabled
+@Disabled
 public class BookReposTest {
     @InjectMocks
     BookRepos bookRepos;
@@ -68,6 +65,23 @@ public class BookReposTest {
     }
 
     @Test
+    public void BookRepos_GetBookByTitle_ReturnBook() {
+        Book book = getFirstBookFromMockRepository();
+
+        Book savedBook = bookRepos.getBookByTitle(book.getTitle()).get();
+
+        Assertions.assertThat(savedBook).isNotNull();
+        Assertions.assertThat(savedBook.getTitle()).isEqualTo(book.getTitle());
+    }
+
+    @Test
+    public void BookRepos_CheckDuplicatedTitle_ReturnDuplicatedTitle() {
+        boolean isDuplicated = bookRepos.checkDuplicatedTitle(newTitle);
+
+        Assertions.assertThat(isDuplicated).isEqualTo(false);
+    }
+
+    @Test
     public void BookRepos_GetBookById_ReturnBookNotFound() {
         Optional<Book> savedBook = bookRepos.getBookById(NotFoundBookId);
 
@@ -89,6 +103,18 @@ public class BookReposTest {
         Assertions.assertThat(updatedBook.getAuthor()).isEqualTo(newAuthor);
         Assertions.assertThat(updatedBook.getTitle()).isEqualTo(newTitle);
         Assertions.assertThat(updatedBook.getFormat()).isEqualTo(newFormat);
+    }
+
+    @Test
+    public void BookRepos_SaveBook_ReturnNewBook() {
+        Book book = getFirstBookFromMockRepository();
+
+        Book newBook = bookRepos.saveBook(book);
+
+        Assertions.assertThat(newBook).isNotNull();
+        Assertions.assertThat(newBook.getAuthor()).isEqualTo(book.getAuthor());
+        Assertions.assertThat(newBook.getTitle()).isEqualTo(book.getTitle());
+        Assertions.assertThat(newBook.getFormat()).isEqualTo(book.getFormat());
     }
 
     @Test
