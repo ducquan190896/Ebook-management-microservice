@@ -16,7 +16,7 @@ public class DataImporter {
     @Bean
 	public CommandLineRunner runner(BookRepos bookRepos) {
 		return args -> {
-			for (int i = 0; i < 50; i++) {
+			for (int i = 0; i < 10; i++) {
 				bookRepos.saveBook(Book.builder()
 										.id(UUID.randomUUID().toString())
 										.author("abc..." + i)

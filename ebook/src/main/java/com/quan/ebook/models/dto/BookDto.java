@@ -9,17 +9,18 @@ import lombok.ToString;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.quan.ebook.models.enums.FormatType;
-import com.quan.ebook.validator.EnumValidator;
+import com.quan.ebook.validator.BookDtoValidator;
 
 import jakarta.validation.constraints.NotBlank;
 
-
+// seperate bookDto into EBookRequest and EbookResponse
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @ToString
+@BookDtoValidator
 public class BookDto {
     
     @NotBlank(message = "the author should not be blank")
@@ -29,9 +30,9 @@ public class BookDto {
     @NotBlank(message = "the title should not be blank")
     @JsonProperty("title")
     private String title;
-
-     // @EnumValidator(enumClass = FormatType.class)
+    
     @JsonProperty("format")
     private FormatType format;
+    // convert format into string from eBookRequest
     
 }

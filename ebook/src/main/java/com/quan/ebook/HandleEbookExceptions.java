@@ -25,20 +25,26 @@ public class HandleEbookExceptions extends ResponseEntityExceptionHandler {
         return Mono.just(new ResponseEntity<Object>(err, HttpStatus.BAD_REQUEST));
     }
 
-    @ExceptionHandler({ ConstraintViolationException.class })
+    @ExceptionHandler(ConstraintViolationException.class )
     public Mono<ResponseEntity<Object>> handleConstraintViolationException(ConstraintViolationException ex) {
         ErrorResponse err = new ErrorResponse(ex.getLocalizedMessage());
         return Mono.just(new ResponseEntity<Object>(err, HttpStatus.BAD_REQUEST));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class )
+    public Mono<ResponseEntity<Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        ErrorResponse err = new ErrorResponse(ex.getLocalizedMessage());
+        return Mono.just(new ResponseEntity<Object>(err, HttpStatus.BAD_REQUEST));
+    }
+    
 
-    @ExceptionHandler({ EntityNotFoundException.class })
+    @ExceptionHandler(EntityNotFoundException.class )
     public Mono<ResponseEntity<Object>> handleEntityException(RuntimeException ex) {
         ErrorResponse err = new ErrorResponse(ex.getLocalizedMessage());
         return Mono.just(new ResponseEntity<Object>(err, HttpStatus.NOT_FOUND));
     }
 
-     @ExceptionHandler({ BadResultException.class })
+     @ExceptionHandler(BadResultException.class )
     public Mono<ResponseEntity<Object>> handleBadResultException(RuntimeException ex) {
         ErrorResponse err = new ErrorResponse(ex.getLocalizedMessage());
         return Mono.just(new ResponseEntity<Object>(err, HttpStatus.BAD_REQUEST));

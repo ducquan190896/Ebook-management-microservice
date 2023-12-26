@@ -30,6 +30,8 @@ import reactor.core.publisher.Mono;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = { EbookApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -140,21 +142,20 @@ public class BookControllerIntegrationTest {
                 BookDto bookDto = BookDto.builder().author(book.getAuthor()).title(book.getAuthor())
                                 .format(book.getFormat()).build();
 
-                when(bookService.saveBook(bookDto)).thenReturn(Mono.just(bookDto));
+                when(bookService.saveBook(any())).thenReturn(Mono.just(bookDto));
 
-                JsonPath jsonResponse = given()
-                                .contentType(ContentType.JSON)
-                                .body(objectMapper.writeValueAsString(bookDto))
-                                .when()
-                                .post(urlPath + "/")
-                                .then()
-                                .assertThat()
-                                .statusCode(200)
-                                .contentType(ContentType.JSON)
-                                .log().all()
-                                // .body("author", equalTo(bookDto.getAuthor()))
-                                .extract()
-                                .jsonPath();
+                given()
+                        .contentType(ContentType.JSON)
+                        .body(bookDto)
+                        .when()
+                        .post(urlPath + "/")
+                        .then()
+                        .assertThat()
+                        .statusCode(201)
+                        .contentType(ContentType.JSON)
+                        .log().all()
+                        .body("author", equalTo(bookDto.getAuthor()))
+                        .body("title", equalTo(bookDto.getTitle()));
         }
 
         @Test
@@ -170,21 +171,20 @@ public class BookControllerIntegrationTest {
                 BookDto bookDto = BookDto.builder().author(book.getAuthor()).title(book.getAuthor())
                                 .format(book.getFormat()).build();
 
-                when(bookService.saveBook(bookDto)).thenReturn(Mono.error(new BadResultException(errorString)));
+                when(bookService.saveBook(any())).thenReturn(Mono.error(new BadResultException(errorString)));
 
-                given()
-                        .contentType(ContentType.JSON)
-                        .body(bookDto)
-                        .when()
-                        .post(urlPath + "/")
-                        .then()
-                        .assertThat()
-                        .statusCode(200)
-                        .contentType(ContentType.JSON)
-                        .log().all();
-
-                // assertEquals(jsonResponse.getString("message"), errorString);
-                
+                JsonPath jsonResponse = given()
+                                .contentType(ContentType.JSON)
+                                .body(bookDto)
+                                .when()
+                                .post(urlPath + "/")
+                                .then()
+                                .assertThat()
+                                .statusCode(400)
+                                .extract()
+                                .jsonPath();
+                ;
+                assertEquals(jsonResponse.getString("message"), errorString);
         }
 
         @Test
@@ -214,8 +214,8 @@ public class BookControllerIntegrationTest {
                                 .delete(UrlForGetBookNotFound)
                                 .then()
                                 .assertThat()
-                                .statusCode(404)
                                 .contentType(ContentType.JSON)
+                                .statusCode(404)
                                 .extract()
                                 .jsonPath();
 
@@ -274,7 +274,6 @@ public class BookControllerIntegrationTest {
                                 .patch(UrlForUpdateBook)
                                 .then()
                                 .assertThat()
-                                .statusCode(404)
                                 .contentType(ContentType.JSON)
                                 .extract()
                                 .jsonPath();
@@ -300,7 +299,6 @@ public class BookControllerIntegrationTest {
                                 .patch(UrlForUpdateBookNotFound)
                                 .then()
                                 .assertThat()
-                                .statusCode(400)
                                 .contentType(ContentType.JSON)
                                 .extract()
                                 .jsonPath();

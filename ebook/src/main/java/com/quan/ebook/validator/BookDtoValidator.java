@@ -3,16 +3,14 @@ package com.quan.ebook.validator;
 import java.lang.annotation.*;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
+@Target({ElementType.TYPE})
 @Documented
-@Constraint(validatedBy = EnumValidatorConstraint.class)
-public @interface EnumValidator {
-    Class<? extends Enum<?>> enumClass();
-    String[] values();
+@Constraint(validatedBy = BookDtoValidatorConstraint.class)
+public @interface BookDtoValidator {
+    // Class<? extends Enum<?>> enumClass();
     String message() default "Value must be in precise format {enumClass}";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {}; 

@@ -40,12 +40,13 @@ public class BookController implements EbookManagementEndpoint {
 
     @Override
     public Mono<ResponseEntity<BookDto>> update(String ebook_id, String author, String title, FormatType format) {
-        return bookService.updateBook(ebook_id, author, title, format).map(book -> new ResponseEntity<>(book, HttpStatus.OK));
+        return bookService.updateBook(ebook_id, author, title, format)
+                .map(book -> new ResponseEntity<>(book, HttpStatus.OK));
     }
 
     @Override
     public Mono<ResponseEntity<HttpStatus>> deleteById(String ebook_id) {
-        return bookService.deleteById(ebook_id).map(__ -> new ResponseEntity<HttpStatus>(HttpStatus.NO_CONTENT));
+        return bookService.deleteById(ebook_id).then(Mono.just(new ResponseEntity<>(HttpStatus.NO_CONTENT)));
     }
 
 }

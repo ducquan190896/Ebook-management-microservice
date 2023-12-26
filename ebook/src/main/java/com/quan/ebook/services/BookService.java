@@ -90,4 +90,10 @@ public class BookService {
         }
         return bookRepos.saveBook(book);
     }
+    // private boolean checkNullValueOfCreatedBook(BookDto book) {
+    //     if(book.getTitle().isBlank() || book.getAuthor().isBlank() ||book.getFormat() == null) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 }

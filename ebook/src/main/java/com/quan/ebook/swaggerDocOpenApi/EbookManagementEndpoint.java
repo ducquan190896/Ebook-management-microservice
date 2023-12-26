@@ -65,7 +65,7 @@ public interface EbookManagementEndpoint {
                         @ApiResponse(responseCode = "200", description = "The book is created", content = @Content(schema = @Schema(implementation = BookDto.class))),
                         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
         })
-        public Mono<ResponseEntity<BookDto>> save(@RequestBody  BookDto book);
+        public Mono<ResponseEntity<BookDto>> save(@RequestBody @Valid  BookDto book);
 
         @Operation(summary = "Update a book", description = "the endpoint to update the book")
         @PatchMapping(value = "/{ebook_id}")
