@@ -6,27 +6,35 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import com.quan.ebook.exceptions.BadResultException;
 import com.quan.ebook.exceptions.EntityNotFoundException;
 import com.quan.ebook.mappers.BookMapper;
-import com.quan.ebook.models.dto.BookDto;
-import com.quan.ebook.models.dto.BookListDto;
 import com.quan.ebook.models.entities.Book;
 import com.quan.ebook.models.enums.FormatType;
+import com.quan.ebook.models.request.BookRequest;
+import com.quan.ebook.models.response.BookResponse;
+import com.quan.ebook.models.response.BookListResponse;
 import com.quan.ebook.repositories.BookRepos;
+import com.quan.ebook.testUtils.DataGenerator;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+@SpringBootTest
 @ExtendWith(MockitoExtension.class)
-@Disabled
+// @Disabled
 public class BookServiceTest {
+    @Autowired
+    DataGenerator dataGenerator;
+
     @Mock(lenient = true)
     BookRepos bookRepos;
 
@@ -42,9 +50,9 @@ public class BookServiceTest {
 
     @Test
     public void BookService_GetBooks_ReturnMonoBooks() {
-        List<Book> bookList = getSampleBookList();
+        List<Book> bookList = dataGenerator.generateBookList();
         when(bookRepos.getbooks()).thenReturn(bookList);
-        Mono<BookListDto> saveBooks = bookService.getAllBooks();
+        Mono<BookListResponse> saveBooks = bookService.getAllBooks();
         StepVerifier
                 .create(saveBooks)
                 .consumeNextWith(newBookList -> {
@@ -56,46 +64,47 @@ public class BookServiceTest {
 
     @Test
     public void BookService_GetBookById_ReturnMonoBookDto() {
-        Book book = getFirstBookFromSampleList();
-        BookDto bookDtoExpected = convertBookToBookDto(book);
+        Book book = dataGenerator.getFirstBookFromSampleList();
+        BookResponse bookDtoExpected = dataGenerator.convertBookToBookResponse(book);
 
         when(bookRepos.getBookById(book.getId())).thenReturn(Optional.ofNullable(book));
-        when(bookMapper.mapBookToBookDto(book)).thenReturn(bookDtoExpected);
+        when(bookMapper.mapBookToBookResponse(book)).thenReturn(bookDtoExpected);
 
-        Mono<BookDto> monoBookDto = bookService.getBookById(book.getId());
+        Mono<BookResponse> monoBookResponse = bookService.getBookById(book.getId());
         StepVerifier
-                .create(monoBookDto)
-                .consumeNextWith(bookDto -> {
-                    assertEquals(bookDto.getAuthor(), book.getAuthor());
-                    assertEquals(bookDto.getTitle(), book.getTitle());
-                    assertEquals(bookDto.getFormat(), book.getFormat());
+                .create(monoBookResponse)
+                .consumeNextWith(bookResponse -> {
+                    assertEquals(bookResponse.getAuthor(), book.getAuthor());
+                    assertEquals(bookResponse.getTitle(), book.getTitle());
+                    assertEquals(bookResponse.getFormat(), book.getFormat());
                 })
                 .verifyComplete();
     }
 
     @Test
     public void BookService_GetBookById_ReturnBookNotFound() {
-        Book book = getFirstBookFromSampleList();
+        Book book = dataGenerator.getFirstBookFromSampleList();
 
         when(bookRepos.getBookById(book.getId())).thenReturn(Optional.empty());
 
-        Mono<BookDto> monoBookDto = bookService.getBookById(book.getId());
+        Mono<BookResponse> monoBookResponse = bookService.getBookById(book.getId());
         StepVerifier
-                .create(monoBookDto)
+                .create(monoBookResponse)
                 .expectErrorMatches(throwable -> throwable instanceof EntityNotFoundException)
                 .verify();
     }
 
     @Test
     public void BookService_SaveBook_ReturnMonoBookDto() {
-        Book book = getFirstBookFromSampleList();
-        BookDto bookDtoExpected = convertBookToBookDto(book);
+        Book book = dataGenerator.getFirstBookFromSampleList();
+        BookResponse bookResponse = dataGenerator.convertBookToBookResponse(book);
+        BookRequest bookRequest= dataGenerator.convertBookToBookRequest(book);
 
-        when(bookRepos.checkDuplicatedTitle(book.getTitle())).thenReturn(false);
+        when(bookRepos.checkDuplicatedTitle(book.getTitle(), book.getAuthor())).thenReturn(false);
         when(bookRepos.saveBook(any(Book.class))).thenReturn(book);
-        when(bookMapper.mapBookToBookDto(any(Book.class))).thenReturn(bookDtoExpected);
+        when(bookMapper.mapBookToBookResponse(any(Book.class))).thenReturn(bookResponse);
 
-        Mono<BookDto> monoBookDto = bookService.saveBook(bookDtoExpected);
+        Mono<BookResponse> monoBookDto = bookService.saveBook(bookRequest);
         StepVerifier
                 .create(monoBookDto)
                 .consumeNextWith(bookDto -> {
@@ -108,12 +117,12 @@ public class BookServiceTest {
 
      @Test
     public void BookService_SaveBook_ReturnTitleDuplicatedException() {
-        Book book = getFirstBookFromSampleList();
-        BookDto bookDto= convertBookToBookDto(book);
+        Book book = dataGenerator.getFirstBookFromSampleList();
+        BookRequest bookRequest= dataGenerator.convertBookToBookRequest(book);
 
-        when(bookRepos.checkDuplicatedTitle(book.getTitle())).thenReturn(true);
+        when(bookRepos.checkDuplicatedTitle(book.getTitle(), book.getAuthor())).thenReturn(true);
 
-        Mono<BookDto> monoBookDto = bookService.saveBook(bookDto);
+        Mono<BookResponse> monoBookDto = bookService.saveBook(bookRequest);
         StepVerifier
                 .create(monoBookDto)
                 .expectErrorMatches(throwable -> throwable instanceof BadResultException)
@@ -122,27 +131,27 @@ public class BookServiceTest {
 
     @Test
     public void BookService_UpdateBook_ReturnMonoBookDto() {
-        Book book = getFirstBookFromSampleList();
+        Book book = dataGenerator.getFirstBookFromSampleList();
         Book updatedBook = Book.builder()
                 .id(book.getId())
                 .author(newAuthor)
                 .title(newTitle)
                 .format(newFormat)
                 .build();
-        BookDto bookDtoExpected = convertBookToBookDto(updatedBook);
+        BookResponse bookDtoExpected = dataGenerator.convertBookToBookResponse(updatedBook);
 
         when(bookRepos.getBookById(book.getId())).thenReturn(Optional.ofNullable(book));
         when(bookService.updateNewBook(book, newAuthor, newTitle, newFormat)).thenReturn(updatedBook);
-        when(bookMapper.mapBookToBookDto(any(Book.class))).thenReturn(bookDtoExpected);
+        when(bookMapper.mapBookToBookResponse(any(Book.class))).thenReturn(bookDtoExpected);
 
-        Mono<BookDto> monoBookDto = bookService.updateBook(book.getId(), newAuthor, newTitle, newFormat);
+        Mono<BookResponse> monoBookResponse = bookService.updateBook(book.getId(), newAuthor, newTitle, newFormat.getName());
         StepVerifier
-                .create(monoBookDto)
-                .consumeNextWith(bookDto -> {
-                    assertNotNull(bookDto);
-                    assertEquals(bookDto.getAuthor(), newAuthor);
-                    assertEquals(bookDto.getTitle(), newTitle);
-                    assertEquals(bookDto.getFormat(), newFormat);
+                .create(monoBookResponse)
+                .consumeNextWith(bookResponse -> {
+                    assertNotNull(bookResponse);
+                    assertEquals(bookResponse.getAuthor(), newAuthor);
+                    assertEquals(bookResponse.getTitle(), newTitle);
+                    assertEquals(bookResponse.getFormat(), newFormat);
 
                 })
                 .verifyComplete();
@@ -150,34 +159,34 @@ public class BookServiceTest {
 
     @Test
     public void BookService_UpdateBook_ReturnBookNotFound() {
-        Book book = getFirstBookFromSampleList();
+        Book book = dataGenerator.getFirstBookFromSampleList();
 
         when(bookRepos.getBookById(book.getId())).thenReturn(Optional.empty());
 
-        Mono<BookDto> monoBookDto = bookService.updateBook(book.getId(), newAuthor, newTitle, newFormat);
+        Mono<BookResponse> monoBookResponse = bookService.updateBook(book.getId(), newAuthor, newTitle, newFormat.getName());
         StepVerifier
-                .create(monoBookDto)
+                .create(monoBookResponse)
                 .expectErrorMatches(throwable -> throwable instanceof EntityNotFoundException)
                 .verify();
     }
 
     @Test
     public void BookService_UpdateBook_ReturnTitleDuplicatedException() {
-        Book book = getFirstBookFromSampleList();
+        Book book = dataGenerator.getFirstBookFromSampleList();
 
         when(bookRepos.getBookById(book.getId())).thenReturn(Optional.ofNullable(book));
-        when(bookRepos.checkDuplicatedTitle(newTitle)).thenReturn(true);
+        when(bookRepos.checkDuplicatedTitle(newTitle, newAuthor)).thenReturn(true);
 
-        Mono<BookDto> monoBookDto = bookService.updateBook(book.getId(), newAuthor, newTitle, newFormat);;
+        Mono<BookResponse> monoBookResponse = bookService.updateBook(book.getId(), newAuthor, newTitle, newFormat.getName());;
         StepVerifier
-                .create(monoBookDto)
+                .create(monoBookResponse)
                 .expectErrorMatches(throwable -> throwable instanceof BadResultException)
                 .verify();
     }
 
     @Test
     public void BookService_DeleteById_ReturnMonoVoid() {
-        Book book = getFirstBookFromSampleList();
+        Book book = dataGenerator.getFirstBookFromSampleList();
 
         when(bookRepos.getBookById(book.getId())).thenReturn(Optional.ofNullable(book));
 
@@ -190,7 +199,7 @@ public class BookServiceTest {
 
     @Test
     public void BookService_DeleteById_ReturnBookNotFound() {
-        Book book = getFirstBookFromSampleList();
+        Book book = dataGenerator.getFirstBookFromSampleList();
 
         when(bookRepos.getBookById(book.getId())).thenReturn(Optional.empty());
 
@@ -200,33 +209,4 @@ public class BookServiceTest {
                 .expectErrorMatches(throwable -> throwable instanceof EntityNotFoundException)
                 .verify();
     }
-
-    private List<Book> getSampleBookList() {
-        Book book1 = Book.builder()
-                .id(UUID.randomUUID().toString())
-                .author("abc")
-                .title("abc_title")
-                .format(FormatType.epub)
-                .build();
-        Book book2 = Book.builder()
-                .id(UUID.randomUUID().toString())
-                .author("abc2")
-                .title("abc2_title")
-                .format(FormatType.epub)
-                .build();
-        return List.of(book1, book2);
-    }
-
-    private Book getFirstBookFromSampleList() {
-        return getSampleBookList().get(0);
-    }
-
-    private BookDto convertBookToBookDto(Book book) {
-        return BookDto.builder()
-                .author(book.getAuthor())
-                .title(book.getTitle())
-                .format(book.getFormat())
-                .build();
-    }
-
 }

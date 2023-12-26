@@ -7,14 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.quan.ebook.models.dto.BookDto;
 import com.quan.ebook.models.entities.Book;
 import com.quan.ebook.models.enums.FormatType;
+import com.quan.ebook.models.request.BookRequest;
+import com.quan.ebook.models.response.BookResponse;
 
 @Component
 public class DataGenerator {
-    @Autowired
-    private ObjectMapper objectMapper;
 
      public Book generateBook() {
         return Book.builder()
@@ -41,11 +40,19 @@ public class DataGenerator {
         return List.of(book1, book2);
     }
 
-    public BookDto convertBookToBookDto(Book book) {
-        return BookDto.builder()
+    public BookResponse convertBookToBookResponse(Book book) {
+        return BookResponse.builder()
                             .author(book.getAuthor())
                             .title(book.getTitle())
                             .format(book.getFormat())
+                            .build();
+    }
+
+    public BookRequest convertBookToBookRequest(Book book) {
+        return BookRequest.builder()
+                            .author(book.getAuthor())
+                            .title(book.getTitle())
+                            .format(book.getFormat().getName())
                             .build();
     }
 
@@ -53,7 +60,7 @@ public class DataGenerator {
         return UUID.randomUUID().toString();
     }
 
-    public String convertBookDtoToString(BookDto bookDto) throws Exception {
-        return objectMapper.writeValueAsString(bookDto);
+    public Book getFirstBookFromSampleList() {
+        return generateBookList().get(0);
     }
 }

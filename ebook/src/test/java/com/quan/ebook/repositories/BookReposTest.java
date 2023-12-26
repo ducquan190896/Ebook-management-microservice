@@ -10,13 +10,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.InjectMocks;
 import org.springframework.boot.test.context.SpringBootTest;
-
 import com.quan.ebook.models.entities.Book;
 import com.quan.ebook.models.enums.FormatType;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Disabled
+// @Disabled
 public class BookReposTest {
     @InjectMocks
     BookRepos bookRepos;
@@ -75,8 +74,8 @@ public class BookReposTest {
     }
 
     @Test
-    public void BookRepos_CheckDuplicatedTitle_ReturnDuplicatedTitle() {
-        boolean isDuplicated = bookRepos.checkDuplicatedTitle(newTitle);
+    public void BookRepos_CheckDuplicatedTitleAndAuthor_ReturnDuplicatedTitleAndAuthor() {
+        boolean isDuplicated = bookRepos.checkDuplicatedTitle(newTitle, newAuthor);
 
         Assertions.assertThat(isDuplicated).isEqualTo(false);
     }

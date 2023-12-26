@@ -50,8 +50,8 @@ public class BookRepos {
     }
 
     // check duplication of author and title
-    public boolean checkDuplicatedTitle(String title) {
-        Optional<Book> bookOptional = this.books.stream().filter(b -> b.getTitle().equals(title)).findFirst();
+    public boolean checkDuplicatedTitle(String title, String author) {
+        Optional<Book> bookOptional = this.books.stream().filter(b -> b.getTitle().equals(title) && b.getAuthor().equals(author)).findFirst();
         if (bookOptional.isPresent()) {
             return true;
         }

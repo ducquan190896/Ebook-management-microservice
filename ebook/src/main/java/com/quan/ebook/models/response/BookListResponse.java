@@ -1,4 +1,4 @@
-package com.quan.ebook.models.dto;
+package com.quan.ebook.models.response;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @ToString
-public class BookListDto {
+public class BookListResponse {
     @JsonProperty("data")
     private List<Book> data;
 }

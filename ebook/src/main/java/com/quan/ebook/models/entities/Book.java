@@ -1,8 +1,6 @@
 package com.quan.ebook.models.entities;
 
 import com.quan.ebook.models.enums.FormatType;
-
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 
@@ -14,13 +12,8 @@ import lombok.*;
 @ToString
 public class Book {
     private String id;
-
-    
     private String author;
-
- 
     private String title;
-
     private FormatType format;
 
     public Book(String author, String title, FormatType format) {

@@ -6,11 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.quan.ebook.mappers.BookMapper;
-import com.quan.ebook.models.dto.BookDto;
-import com.quan.ebook.models.dto.BookListDto;
-import com.quan.ebook.models.enums.FormatType;
+import com.quan.ebook.models.request.BookRequest;
+import com.quan.ebook.models.response.BookResponse;
+import com.quan.ebook.models.response.BookListResponse;
 import com.quan.ebook.services.BookService;
 import com.quan.ebook.swaggerDocOpenApi.EbookManagementEndpoint;
 import reactor.core.publisher.Mono;
@@ -24,22 +22,22 @@ public class BookController implements EbookManagementEndpoint {
     BookService bookService;
 
     @Override
-    public Mono<ResponseEntity<BookListDto>> findAll() {
+    public Mono<ResponseEntity<BookListResponse>> findAll() {
         return bookService.getAllBooks().map(books -> new ResponseEntity<>(books, HttpStatus.OK));
     }
 
     @Override
-    public Mono<ResponseEntity<BookDto>> findById(String ebook_id) {
+    public Mono<ResponseEntity<BookResponse>> findById(String ebook_id) {
         return bookService.getBookById(ebook_id).map(book -> new ResponseEntity<>(book, HttpStatus.OK));
     }
 
     @Override
-    public Mono<ResponseEntity<BookDto>> save(BookDto book) {
-        return bookService.saveBook(book).map(newBook -> new ResponseEntity<>(newBook, HttpStatus.CREATED));
+    public Mono<ResponseEntity<BookResponse>> save(BookRequest bookRequest) {
+        return bookService.saveBook(bookRequest).map(newBook -> new ResponseEntity<>(newBook, HttpStatus.CREATED));
     }
 
     @Override
-    public Mono<ResponseEntity<BookDto>> update(String ebook_id, String author, String title, FormatType format) {
+    public Mono<ResponseEntity<BookResponse>> update(String ebook_id, String author, String title, String format) {
         return bookService.updateBook(ebook_id, author, title, format)
                 .map(book -> new ResponseEntity<>(book, HttpStatus.OK));
     }

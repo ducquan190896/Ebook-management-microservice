@@ -1,4 +1,4 @@
-package com.quan.ebook.models.dto;
+package com.quan.ebook.models.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,22 +6,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.quan.ebook.models.enums.FormatType;
-import com.quan.ebook.validator.BookDtoValidator;
-
 import jakarta.validation.constraints.NotBlank;
 
-// seperate bookDto into EBookRequest and EbookResponse
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @ToString
-@BookDtoValidator
-public class BookDto {
+public class BookResponse {
     
     @NotBlank(message = "the author should not be blank")
     @JsonProperty("author")
@@ -33,6 +28,5 @@ public class BookDto {
     
     @JsonProperty("format")
     private FormatType format;
-    // convert format into string from eBookRequest
-    
+
 }
