@@ -53,7 +53,7 @@ public interface EbookManagementEndpoint {
         public Mono<ResponseEntity<BookResponse>> findById(@PathVariable(value = "ebook_id") String ebook_id);
 
         @Operation(summary = "Create a book", description = "the endpoint to create the book")
-        @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+        @PostMapping(value = "/")
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "The book is created", content = @Content(schema = @Schema(implementation = BookResponse.class))),
                         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))

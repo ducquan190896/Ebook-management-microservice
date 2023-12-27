@@ -3,7 +3,6 @@ package com.quan.ebook.controllers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +35,6 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = { EbookApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles({ "test" })
-// @Disabled
 public class BookControllerIntegrationTest {
         @Autowired
         DataGenerator dataGenerator;

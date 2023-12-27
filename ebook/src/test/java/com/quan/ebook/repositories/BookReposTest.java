@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.UUID;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.InjectMocks;
@@ -15,7 +14,6 @@ import com.quan.ebook.models.enums.FormatType;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-// @Disabled
 public class BookReposTest {
     @InjectMocks
     BookRepos bookRepos;
@@ -46,7 +44,6 @@ public class BookReposTest {
     @Test
     public void BookRepos_GetBooks_ReturnBooks() {
         List<Book> books = bookRepos.getbooks();
-        System.out.println(books.size() + " ... size");
 
         Assertions.assertThat(books).isNotNull();
         Assertions.assertThat(books.size()).isEqualTo(2);
