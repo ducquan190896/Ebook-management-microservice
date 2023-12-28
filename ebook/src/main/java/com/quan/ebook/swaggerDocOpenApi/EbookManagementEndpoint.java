@@ -56,6 +56,7 @@ public interface EbookManagementEndpoint {
         @PostMapping(value = "/")
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "The book is created", content = @Content(schema = @Schema(implementation = BookResponse.class))),
+                        @ApiResponse(responseCode = "400", description = "the book title and author is duplicated / the format is not in correct type", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
         })
         public Mono<ResponseEntity<BookResponse>> save(@RequestBody @Valid  BookRequest book);
@@ -71,6 +72,7 @@ public interface EbookManagementEndpoint {
         })
         @ApiResponses({
                         @ApiResponse(responseCode = "201", description = "The book is created", content = @Content(schema = @Schema(implementation = BookResponse.class))),
+                        @ApiResponse(responseCode = "400", description = "the book title and author is duplicated / the format is not in correct type", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                         @ApiResponse(responseCode = "404", description = "Book not found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
         })
